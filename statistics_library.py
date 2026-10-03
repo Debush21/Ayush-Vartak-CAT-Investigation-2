@@ -18,3 +18,13 @@ def minimum(data):
             smallest = value
     return smallest #return the smallest value we found
 
+# function for maximum
+def maximum(data):
+    if len(data) == 0: # if the list is empty, we can't find a maximum
+        return None
+    largest = data[0] # assume the first value is the largest
+    for value in data: # check every value in the list
+        if value > largest: # check if the current value is larger
+            largest = value # if it is larger, make it the new largest
+    return largest # return the largest value we found
+
