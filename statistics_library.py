@@ -107,3 +107,19 @@ def interquartile_range(data):
     q3 = upper_quartile(data) # find the upper quartile
 
     return q3 - q1 # subtract the lower quartile from the upper quartile
+
+# function for variance
+def variance(data):
+    if len(data) == 0: # if the list is empty, we can't calculate the variance
+        return None
+
+    average = mean(data) # find the mean of the data
+
+    total = 0 # start a running total at zero
+
+    for value in data: # go through every value in the list
+        difference = value - average # find how far the value is from the mean
+        squared_difference = difference ** 2 # square the difference
+        total = total + squared_difference # add it to the running total
+
+    return total / len(data) # divide by the number of values to get the variance
