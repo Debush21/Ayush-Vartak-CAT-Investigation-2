@@ -53,3 +53,20 @@ def median(data):
     if len(values) % 2 == 0: # check if there is an even number of values
         return (values[middle - 1] + values[middle]) / 2 # average the two middle values
     return values[middle] # return the middle value
+
+# function for lower quartile
+def lower_quartile(data):
+    if len(data) == 0: # if the list is empty, we can't calculate the lower quartile
+        return None
+    values = [] # make a new list so we don't change the original data
+    for value in data: # go through every value in the original list
+        values.append(value) # add each value to the new list
+    for i in range(len(values)): # go through each position in the list
+        for j in range(i + 1, len(values)): # compare it with the values after it
+            if values[j] < values[i]: # check if the values are in the wrong order
+                temporary = values[i] # temporarily save the first value
+                values[i] = values[j] # move the smaller value into the first position
+                values[j] = temporary # move the saved value into the other position
+    middle = len(values) // 2 # find the middle position
+    lower_half = values[:middle] # take the lower half of the data
+    return median(lower_half) # find the median of the lower half
