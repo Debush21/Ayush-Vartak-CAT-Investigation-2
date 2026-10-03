@@ -123,3 +123,12 @@ def variance(data):
         total = total + squared_difference # add it to the running total
 
     return total / len(data) # divide by the number of values to get the variance
+
+# function for standard deviation
+def standard_deviation(data):
+    if len(data) == 0: # if the list is empty, we can't calculate the standard deviation
+        return None
+
+    data_variance = variance(data) # find the variance of the data
+
+    return data_variance ** 0.5 # find the square root of the variance
