@@ -97,3 +97,13 @@ def upper_quartile(data):
         upper_half = values[middle + 1:] # leave out the middle value
 
     return median(upper_half) # find the median of the upper half
+
+# function for interquartile range
+def interquartile_range(data):
+    if len(data) == 0: # if the list is empty, we can't calculate the interquartile range
+        return None
+
+    q1 = lower_quartile(data) # find the lower quartile
+    q3 = upper_quartile(data) # find the upper quartile
+
+    return q3 - q1 # subtract the lower quartile from the upper quartile
