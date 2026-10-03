@@ -7,3 +7,14 @@ def mean(data):
     for value in data: #go through every number in the list one by one
         total = total + value #add the current number to our running total
     return total / len(data) #divide the total by how many numbers there are to get
+
+#funtion for minimum
+def minimum(data): 
+    if len(data) == 0: #if the list is empty without anything we can't calculate anything
+        return None
+    smallest = data[0] #assume the first value is the smallest
+    for value in data:#check if the current value is smaller than our current smallest
+        if value < smallest:
+            smallest = value
+    return smallest #return the smallest value we found
+
