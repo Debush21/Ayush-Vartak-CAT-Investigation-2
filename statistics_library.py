@@ -28,3 +28,10 @@ def maximum(data):
             largest = value # if it is larger, make it the new largest
     return largest # return the largest value we found
 
+# function for range
+def data_range(data):
+    if len(data) == 0: # if the list is empty, we can't calculate the range
+        return None
+    largest = maximum(data) # find the largest value
+    smallest = minimum(data) # find the smallest value
+    return largest - smallest # subtract the smallest value from the largest
