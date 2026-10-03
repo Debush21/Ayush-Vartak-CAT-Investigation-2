@@ -1,4 +1,4 @@
-#funtion for mean 
+#function for mean 
 def mean(data):
     #this function finds the average of a list of numbers that is provided to it
     if len(data) == 0: #if the list is empty without anything we can't calculate anything
@@ -8,7 +8,7 @@ def mean(data):
         total = total + value #add the current number to our running total
     return total / len(data) #divide the total by how many numbers there are to get
 
-#funtion for minimum
+#function for minimum
 def minimum(data): 
     if len(data) == 0: #if the list is empty without anything we can't calculate anything
         return None
