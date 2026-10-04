@@ -1,7 +1,6 @@
 from statistics_library import *
 
-# Open the normal dataset
-file = open("normal.txt", "r")
+file = open("ax_b.txt", "r")
 
 # Create an empty list to store the data
 data = []
