@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 # Open the CSV file
-file = open("linear_1.numbers", "r")
+file = open("linear_1 .csv", "r")
 
 # Lists to store the x values, y values and colours
 x_values = []
@@ -9,8 +9,8 @@ y_values = []
 colours = []
 # Read each line in the file
 for line in file:
-    # Remove the newline and split the line at each tab
-    data = line.strip().split("\t")
+    # Remove the newline and split the line at each comma
+    data = line.strip().split(",")
     # Store the x value
     x_values.append(float(data[0]))
     # Store the y value
