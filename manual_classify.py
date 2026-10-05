@@ -29,26 +29,26 @@ file.close()
 # ============================================================
 
 window = tk.Tk()
-window.title("LINEAR CLASSIFICATION // AI TRAINING LAB")
-window.geometry("1200x800")
-window.configure(bg="#10131a")
+
+window.title("LINEAR CLASSIFICATION LAB")
+window.geometry("1250x850")
+window.configure(bg="#0b0f17")
 
 
 # ============================================================
 # COLOURS
 # ============================================================
 
-BACKGROUND = "#10131a"
-PANEL = "#181d27"
-PANEL2 = "#202632"
-TEXT = "#f2f5f7"
-MUTED = "#8d98a8"
+BG = "#0b0f17"
+PANEL = "#171d29"
+INPUT = "#ffffff"
 
-RED = "#ff4d6d"
-BLUE = "#4da6ff"
-GREEN = "#35e39a"
+WHITE = "#ffffff"
+GREY = "#8f9aaa"
+
 YELLOW = "#ffd166"
-PURPLE = "#a970ff"
+GREEN = "#35e39a"
+PURPLE = "#7067ff"
 
 
 # ============================================================
@@ -57,259 +57,140 @@ PURPLE = "#a970ff"
 
 title = tk.Label(
     window,
-    text="LINEAR CLASSIFICATION",
-    font=("Arial", 26, "bold"),
-    fg=TEXT,
-    bg=BACKGROUND
+    text="LINEAR CLASSIFICATION LAB",
+    font=("Arial", 28, "bold"),
+    fg=WHITE,
+    bg=BG
 )
 
-title.pack(pady=(20, 0))
+title.pack(pady=(15, 0))
+
 
 subtitle = tk.Label(
     window,
-    text="MANUAL CLASSIFICATION // FIND THE BEST SEPARATING LINE",
+    text="FIND THE BEST LINE TO SEPARATE THE DATA",
     font=("Arial", 10, "bold"),
-    fg=MUTED,
-    bg=BACKGROUND
+    fg=GREY,
+    bg=BG
 )
 
-subtitle.pack(pady=(2, 15))
+subtitle.pack(pady=(2, 10))
 
 
 # ============================================================
-# MAIN AREA
+# INPUT BAR
 # ============================================================
 
-main = tk.Frame(window, bg=BACKGROUND)
-main.pack(fill="both", expand=True, padx=20, pady=5)
-
-
-# ============================================================
-# GRAPH PANEL
-# ============================================================
-
-graph_panel = tk.Frame(
-    main,
+input_bar = tk.Frame(
+    window,
     bg=PANEL,
-    highlightbackground="#303846",
-    highlightthickness=1
+    height=95
 )
 
-graph_panel.pack(side="left", fill="both", expand=True, padx=(0, 10))
-
-
-# Create graph
-fig, ax = plt.subplots(figsize=(7, 6))
-
-fig.patch.set_facecolor(PANEL)
-ax.set_facecolor("#11151d")
-
-ax.scatter(
-    x_values,
-    y_values,
-    c=colours,
-    s=60,
-    edgecolors="white",
-    linewidths=0.5
+input_bar.pack(
+    fill="x",
+    padx=20,
+    pady=(0, 15)
 )
 
-ax.set_title(
-    "DATASET",
-    color=TEXT,
-    fontsize=14,
-    fontweight="bold"
-)
-
-ax.set_xlabel("X VALUE", color=MUTED)
-ax.set_ylabel("Y VALUE", color=MUTED)
-
-ax.tick_params(colors=MUTED)
-
-for spine in ax.spines.values():
-    spine.set_color("#303846")
-
-ax.grid(
-    True,
-    color="#303846",
-    alpha=0.4
-)
-
-canvas = FigureCanvasTkAgg(fig, master=graph_panel)
-canvas.draw()
-canvas.get_tk_widget().pack(
-    fill="both",
-    expand=True,
-    padx=15,
-    pady=15
-)
+input_bar.pack_propagate(False)
 
 
-# ============================================================
-# CONTROL PANEL
-# ============================================================
+# -------------------------
+# m
+# -------------------------
 
-control_panel = tk.Frame(
-    main,
-    bg=PANEL,
-    width=320,
-    highlightbackground="#303846",
-    highlightthickness=1
-)
-
-control_panel.pack(side="right", fill="y")
-control_panel.pack_propagate(False)
-
-
-# ============================================================
-# DATASET CARD
-# ============================================================
-
-dataset_title = tk.Label(
-    control_panel,
-    text="DATASET",
-    font=("Arial", 10, "bold"),
-    fg=MUTED,
-    bg=PANEL
-)
-
-dataset_title.pack(anchor="w", padx=20, pady=(20, 3))
-
-
-dataset_label = tk.Label(
-    control_panel,
-    text=f"{len(x_values)} DATA POINTS",
-    font=("Arial", 22, "bold"),
-    fg=TEXT,
-    bg=PANEL
-)
-
-dataset_label.pack(anchor="w", padx=20)
-
-
-# ============================================================
-# SCORE
-# ============================================================
-
-score_title = tk.Label(
-    control_panel,
-    text="CLASSIFICATION SCORE",
-    font=("Arial", 10, "bold"),
-    fg=MUTED,
-    bg=PANEL
-)
-
-score_title.pack(anchor="w", padx=20, pady=(25, 3))
-
-
-score_label = tk.Label(
-    control_panel,
-    text="-- %",
-    font=("Arial", 42, "bold"),
-    fg=GREEN,
-    bg=PANEL
-)
-
-score_label.pack(anchor="w", padx=20)
-
-
-status_label = tk.Label(
-    control_panel,
-    text="ENTER A LINE TO BEGIN",
+tk.Label(
+    input_bar,
+    text="GRADIENT",
     font=("Arial", 9, "bold"),
-    fg=MUTED,
+    fg=GREY,
     bg=PANEL
+).pack(
+    side="left",
+    padx=(25, 5)
 )
-
-status_label.pack(anchor="w", padx=20, pady=(0, 20))
-
-
-# ============================================================
-# INPUT AREA
-# ============================================================
-
-line_title = tk.Label(
-    control_panel,
-    text="YOUR LINE",
-    font=("Arial", 10, "bold"),
-    fg=MUTED,
-    bg=PANEL
-)
-
-line_title.pack(anchor="w", padx=20, pady=(5, 10))
-
-
-# Gradient
-m_frame = tk.Frame(control_panel, bg=PANEL)
-m_frame.pack(fill="x", padx=20)
-
-m_label = tk.Label(
-    m_frame,
-    text="GRADIENT (m)",
-    font=("Arial", 10, "bold"),
-    fg=TEXT,
-    bg=PANEL
-)
-
-m_label.pack(side="left")
 
 
 m_entry = tk.Entry(
-    m_frame,
-    font=("Arial", 14, "bold"),
-    bg=PANEL2,
-    fg=TEXT,
-    insertbackground=TEXT,
-    relief="flat"
+    input_bar,
+    font=("Arial", 20, "bold"),
+    fg="#111111",
+    bg=INPUT,
+    insertbackground="#111111",
+    width=8,
+    justify="center",
+    relief="solid",
+    bd=2
 )
 
-m_entry.pack(side="right", ipadx=8, ipady=6)
+m_entry.pack(
+    side="left",
+    padx=5,
+    ipady=8
+)
+
+m_entry.insert(0, "1")
 
 
-# Y intercept
-c_frame = tk.Frame(control_panel, bg=PANEL)
-c_frame.pack(fill="x", padx=20, pady=12)
+# -------------------------
+# c
+# -------------------------
 
-c_label = tk.Label(
-    c_frame,
-    text="Y-INTERCEPT (c)",
-    font=("Arial", 10, "bold"),
-    fg=TEXT,
+tk.Label(
+    input_bar,
+    text="Y-INTERCEPT",
+    font=("Arial", 9, "bold"),
+    fg=GREY,
     bg=PANEL
+).pack(
+    side="left",
+    padx=(25, 5)
 )
-
-c_label.pack(side="left")
 
 
 c_entry = tk.Entry(
-    c_frame,
-    font=("Arial", 14, "bold"),
-    bg=PANEL2,
-    fg=TEXT,
-    insertbackground=TEXT,
-    relief="flat"
+    input_bar,
+    font=("Arial", 20, "bold"),
+    fg="#111111",
+    bg=INPUT,
+    insertbackground="#111111",
+    width=8,
+    justify="center",
+    relief="solid",
+    bd=2
 )
 
-c_entry.pack(side="right", ipadx=8, ipady=6)
+c_entry.pack(
+    side="left",
+    padx=5,
+    ipady=8
+)
+
+c_entry.insert(0, "0")
 
 
-# ============================================================
-# EQUATION DISPLAY
-# ============================================================
+# -------------------------
+# Equation
+# -------------------------
 
-equation_label = tk.Label(
-    control_panel,
-    text="y = mx + c",
-    font=("Arial", 16, "bold"),
+equation = tk.Label(
+    input_bar,
+    text="y = 1x + 0",
+    font=("Arial", 17, "bold"),
     fg=YELLOW,
     bg=PANEL
 )
 
-equation_label.pack(pady=15)
+equation.pack(
+    side="left",
+    padx=30
+)
 
 
-# ============================================================
-# CLASSIFY FUNCTION
-# ============================================================
+# -------------------------
+# CLASSIFY BUTTON
+# -------------------------
 
 def classify():
 
@@ -327,9 +208,9 @@ def classify():
         return
 
 
-    # --------------------------------------------------------
-    # Calculate scores
-    # --------------------------------------------------------
+    # ========================================================
+    # CALCULATE SCORES
+    # ========================================================
 
     score_1_correct = 0
     score_2_correct = 0
@@ -340,21 +221,17 @@ def classify():
 
         if y_values[i] >= line_y:
 
-            # Red above
             if colours[i] == "red":
                 score_1_correct += 1
 
-            # Blue above
             if colours[i] == "blue":
                 score_2_correct += 1
 
         else:
 
-            # Blue below
             if colours[i] == "blue":
                 score_1_correct += 1
 
-            # Red below
             if colours[i] == "red":
                 score_2_correct += 1
 
@@ -365,63 +242,55 @@ def classify():
     best_score = max(score_1, score_2)
 
 
-    # --------------------------------------------------------
-    # Update interface
-    # --------------------------------------------------------
+    # ========================================================
+    # UPDATE TEXT
+    # ========================================================
+
+    equation.config(
+        text=f"y = {m:g}x + {c:g}"
+    )
 
     score_label.config(
         text=f"{best_score:.1f}%"
     )
 
-    equation_label.config(
-        text=f"y = {m:g}x + {c:g}"
-    )
-
 
     if best_score >= 95:
-
         score_label.config(fg=GREEN)
-
         status_label.config(
             text="EXCELLENT CLASSIFICATION",
             fg=GREEN
         )
 
     elif best_score >= 85:
-
         score_label.config(fg=YELLOW)
-
         status_label.config(
             text="STRONG CLASSIFICATION",
             fg=YELLOW
         )
 
     elif best_score >= 70:
-
         score_label.config(fg=YELLOW)
-
         status_label.config(
-            text="DECENT — KEEP OPTIMISING",
+            text="KEEP IMPROVING",
             fg=YELLOW
         )
 
     else:
-
-        score_label.config(fg=RED)
-
+        score_label.config(fg="#ff4d6d")
         status_label.config(
-            text="POOR SEPARATION — TRY AGAIN",
-            fg=RED
+            text="TRY A DIFFERENT LINE",
+            fg="#ff4d6d"
         )
 
 
-    # --------------------------------------------------------
-    # Redraw graph
-    # --------------------------------------------------------
+    # ========================================================
+    # REDRAW GRAPH
+    # ========================================================
 
     ax.clear()
 
-    ax.set_facecolor("#11151d")
+    ax.set_facecolor("#0d121b")
 
     ax.scatter(
         x_values,
@@ -429,14 +298,15 @@ def classify():
         c=colours,
         s=65,
         edgecolors="white",
-        linewidths=0.6
+        linewidths=0.5
     )
 
 
-    # Line
+    # Classification line
+
     x_line = [
-        min(x_values),
-        max(x_values)
+        min(x_values) - 5,
+        max(x_values) + 5
     ]
 
     y_line = [
@@ -452,35 +322,45 @@ def classify():
     )
 
 
-    # Fill the two sides
+    # Light classification regions
+
     ax.fill_between(
         x_line,
         y_line,
-        max(y_values) + 20,
-        color=RED,
-        alpha=0.04
+        max(y_values) + 30,
+        color="#ff4d6d",
+        alpha=0.05
     )
 
     ax.fill_between(
         x_line,
         y_line,
-        min(y_values) - 20,
-        color=BLUE,
-        alpha=0.04
+        min(y_values) - 30,
+        color="#4da6ff",
+        alpha=0.05
     )
 
 
     ax.set_title(
-        f"CLASSIFICATION // {best_score:.1f}%",
-        color=TEXT,
-        fontsize=14,
+        f"CLASSIFICATION SCORE: {best_score:.1f}%",
+        color=WHITE,
+        fontsize=15,
         fontweight="bold"
     )
 
-    ax.set_xlabel("X VALUE", color=MUTED)
-    ax.set_ylabel("Y VALUE", color=MUTED)
+    ax.set_xlabel(
+        "X VALUE",
+        color=GREY
+    )
 
-    ax.tick_params(colors=MUTED)
+    ax.set_ylabel(
+        "Y VALUE",
+        color=GREY
+    )
+
+    ax.tick_params(
+        colors=GREY
+    )
 
     for spine in ax.spines.values():
         spine.set_color("#303846")
@@ -494,66 +374,223 @@ def classify():
     canvas.draw()
 
 
-# ============================================================
-# BUTTON
-# ============================================================
-
 classify_button = tk.Button(
-    control_panel,
-    text="CLASSIFY LINE",
+    input_bar,
+    text="CLASSIFY",
     command=classify,
-    font=("Arial", 14, "bold"),
-    fg="white",
-    bg="#635bff",
-    activebackground="#7b75ff",
-    activeforeground="white",
+    font=("Arial", 13, "bold"),
+    fg=WHITE,
+    bg=PURPLE,
+    activebackground="#918aff",
+    activeforeground=WHITE,
     relief="flat",
-    cursor="hand2"
-)
-
-classify_button.pack(
-    fill="x",
-    padx=20,
-    pady=20,
-    ipady=12
-)
-
-
-# ============================================================
-# INSTRUCTIONS
-# ============================================================
-
-instructions = tk.Label(
-    control_panel,
-    text=(
-        "HOW IT WORKS\n\n"
-        "1. Look at the red and blue points.\n"
-        "2. Choose a gradient and intercept.\n"
-        "3. Draw your separating line.\n"
-        "4. The program checks every point.\n"
-        "5. The higher score becomes your result."
-    ),
-    font=("Arial", 9),
-    justify="left",
-    fg=MUTED,
-    bg=PANEL
-)
-
-instructions.pack(
-    anchor="w",
-    padx=20,
+    cursor="hand2",
+    padx=25,
     pady=10
 )
 
+classify_button.pack(
+    side="right",
+    padx=25
+)
+
 
 # ============================================================
-# KEYBOARD SHORTCUT
+# MAIN CONTENT
+# ============================================================
+
+content = tk.Frame(
+    window,
+    bg=BG
+)
+
+content.pack(
+    fill="both",
+    expand=True,
+    padx=20
+)
+
+
+# ============================================================
+# GRAPH PANEL
+# ============================================================
+
+graph_panel = tk.Frame(
+    content,
+    bg=PANEL
+)
+
+graph_panel.pack(
+    side="left",
+    fill="both",
+    expand=True,
+    padx=(0, 15)
+)
+
+
+fig, ax = plt.subplots(
+    figsize=(8, 6)
+)
+
+fig.patch.set_facecolor(PANEL)
+
+ax.set_facecolor("#0d121b")
+
+ax.scatter(
+    x_values,
+    y_values,
+    c=colours,
+    s=65,
+    edgecolors="white",
+    linewidths=0.5
+)
+
+ax.set_title(
+    "DATASET",
+    color=WHITE,
+    fontsize=15,
+    fontweight="bold"
+)
+
+ax.set_xlabel(
+    "X VALUE",
+    color=GREY
+)
+
+ax.set_ylabel(
+    "Y VALUE",
+    color=GREY
+)
+
+ax.tick_params(
+    colors=GREY
+)
+
+for spine in ax.spines.values():
+    spine.set_color("#303846")
+
+ax.grid(
+    True,
+    color="#303846",
+    alpha=0.4
+)
+
+
+canvas = FigureCanvasTkAgg(
+    fig,
+    master=graph_panel
+)
+
+canvas.draw()
+
+canvas.get_tk_widget().pack(
+    fill="both",
+    expand=True,
+    padx=15,
+    pady=15
+)
+
+
+# ============================================================
+# SCORE PANEL
+# ============================================================
+
+score_panel = tk.Frame(
+    content,
+    bg=PANEL,
+    width=260
+)
+
+score_panel.pack(
+    side="right",
+    fill="y"
+)
+
+score_panel.pack_propagate(False)
+
+
+tk.Label(
+    score_panel,
+    text="CLASSIFICATION",
+    font=("Arial", 10, "bold"),
+    fg=GREY,
+    bg=PANEL
+).pack(
+    pady=(35, 5)
+)
+
+
+score_label = tk.Label(
+    score_panel,
+    text="--%",
+    font=("Arial", 45, "bold"),
+    fg=GREEN,
+    bg=PANEL
+)
+
+score_label.pack()
+
+
+status_label = tk.Label(
+    score_panel,
+    text="READY",
+    font=("Arial", 10, "bold"),
+    fg=GREY,
+    bg=PANEL
+)
+
+status_label.pack(
+    pady=5
+)
+
+
+tk.Label(
+    score_panel,
+    text=f"{len(x_values)} DATA POINTS",
+    font=("Arial", 16, "bold"),
+    fg=WHITE,
+    bg=PANEL
+).pack(
+    pady=(35, 5)
+)
+
+
+tk.Label(
+    score_panel,
+    text=(
+        "Enter your line above.\n\n"
+        "m = gradient\n"
+        "c = y-intercept\n\n"
+        "The program checks every\n"
+        "point and calculates the\n"
+        "best possible classification\n"
+        "score for your line."
+    ),
+    font=("Arial", 10),
+    justify="center",
+    fg=GREY,
+    bg=PANEL
+).pack(
+    pady=20,
+    padx=20
+)
+
+
+# ============================================================
+# ENTER KEY
 # ============================================================
 
 window.bind(
     "<Return>",
     lambda event: classify()
 )
+
+
+# ============================================================
+# AUTOMATICALLY SELECT m
+# ============================================================
+
+m_entry.focus()
 
 
 # ============================================================
