@@ -6,7 +6,7 @@ import math
 x_values = []
 y_values = []
 labels = []
-
+ 
 # Open the CSV file and read each data point.
 with open("non_linear_1.csv", "r") as file:
     for line in file:
