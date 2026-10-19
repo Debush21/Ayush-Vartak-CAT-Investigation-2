@@ -1,99 +1,147 @@
 
-import numpy as np
+# Import libraries for plotting, random numbers and text processing
 import matplotlib.pyplot as plt
+import random
 import re
 
-# Get the quadratic from the user
-equation = input("Enter a quadratic (e.g. -x^2 - 6x + 5): ")
-equation = equation.replace(" ", "").replace("^", "**")
+# Ask the user to enter a quadratic equation
+equation = input("Enter the quadratic equation: ")
 
-# Convert the quadratic into coefficients a, b and c
-equation = equation.replace("-", "+-")
-if equation.startswith("+"):
-    equation = equation[1:]
+# Remove spaces from the equation
+equation = equation.replace(" ", "")
 
-terms = equation.split("+")
-a, b, c = 0.0, 0.0, 0.0
+# Check whether the equation contains an equals sign
+if "=" in equation:
+    # Keep only the expression on the right side
+    equation = equation.split("=")[1]
 
-for term in terms:
-    if "x**2" in term:
-        coefficient = term.replace("x**2", "")
-        a = float(coefficient) if coefficient not in ("", "+") else 1.0
-        if coefficient == "-":
-            a = -1.0
-    elif "x" in term:
-        coefficient = term.replace("x", "")
-        b = float(coefficient) if coefficient not in ("", "+") else 1.0
-        if coefficient == "-":
-            b = -1.0
-    elif term:
-        c = float(term)
+# Insert multiplication signs between numbers and x
+equation = re.sub(r'(\d)x', r'\1*x', equation)
 
-if a == 0:
-    print("Error: Please enter a quadratic with an x^2 term.")
-else:
-    # Define the quadratic function
-    def f(x):
-        return a * x**2 + b * x + c
+# Replace ^ with ** so Python can calculate powers
+equation = equation.replace("^", "**")
 
-    # Hill climbing settings
-    x = 0.0
-    step_size = 1.0
-    iterations = 0
-    max_iterations = 1000
-    tolerance = 0.0001
+# Define a function to calculate y for any x value
+def calculate_y(x):
+    # Evaluate the equation using the given x value
+    return eval(equation, {"__builtins__": {}}, {"x": x})
 
-    # Store the points visited
-    visited_x = [x]
-    visited_y = [f(x)]
+# Choose a random starting x value between -1000 and 1000
+x = random.uniform(-1000, 1000)
 
-    # Hill climbing algorithm
-    while iterations < max_iterations:
-        current_y = f(x)
+# Calculate the starting y value
+y = calculate_y(x)
 
-        left_x = x - step_size
-        right_x = x + step_size
+# Store the starting x coordinate of the climbing path
+path_x = [x]
 
-        left_y = f(left_x)
-        right_y = f(right_x)
+# Store the starting y coordinate of the climbing path
+path_y = [y]
 
-        if left_y > current_y and left_y >= right_y:
-            x = left_x
-        elif right_y > current_y:
-            x = right_x
-        else:
-            step_size /= 2
+# Set the initial step size
+step = 1.0
 
-        iterations += 1
-        visited_x.append(x)
-        visited_y.append(f(x))
+# Set the smallest allowed step size
+minimum_step = 0.001
 
-        if step_size < tolerance:
-            break
+# Continue climbing while the step size is large enough
+while step >= minimum_step:
+    # Calculate the x coordinate one step to the left
+    left_x = x - step
 
-    # Display the results
-    print("\nOptimisation Results")
-    print("--------------------")
-    print(f"Maximum x value: {x:.6f}")
-    print(f"Maximum y value: {f(x):.6f}")
-    print(f"Iterations: {iterations}")
+    # Calculate the x coordinate one step to the right
+    right_x = x + step
 
-    # Generate values for plotting
-    x_values = np.linspace(x - 10, x + 10, 500)
-    y_values = f(x_values)
+    # Calculate the y value to the left
+    left_y = calculate_y(left_x)
 
-    # Plot the quadratic and the search path
-    plt.figure(figsize=(10, 6))
-    plt.plot(x_values, y_values, label="Quadratic function")
-    plt.scatter(visited_x, visited_y, color="orange",
-                s=20, label="Hill-climbing iterations")
-    plt.scatter(x, f(x), color="red", s=100,
-                label="Estimated maximum", zorder=5)
+    # Calculate the y value to the right
+    right_y = calculate_y(right_x)
 
-    plt.xlabel("x")
-    plt.ylabel("f(x)")
-    plt.title("Quadratic Optimisation Using Hill Climbing")
-    plt.grid(True)
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
+    # Check whether moving left increases the y value
+    if left_y > y:
+        # Move one step to the left
+        x = left_x
+
+        # Update the current y value
+        y = left_y
+
+        # Record the new x coordinate
+        path_x.append(x)
+
+        # Record the new y coordinate
+        path_y.append(y)
+
+    # Otherwise, check whether moving right increases the y value
+    elif right_y > y:
+        # Move one step to the right
+        x = right_x
+
+        # Update the current y value
+        y = right_y
+
+        # Record the new x coordinate
+        path_x.append(x)
+
+        # Record the new y coordinate
+        path_y.append(y)
+
+    # If neither direction improves the y value
+    else:
+        # Halve the step size to search more precisely
+        step = step / 2
+
+# Display the approximate maximum x value
+print("Maximum x-value:", x)
+
+# Display the approximate maximum y value
+print("Maximum y-value:", y)
+
+# Create an empty list to store graph x coordinates
+graph_x = []
+
+# Create an empty list to store graph y coordinates
+graph_y = []
+
+# Set the starting x value for the graph
+value = -1000
+
+# Generate graph points until x reaches 1000
+while value <= 1000:
+    # Store the current x coordinate
+    graph_x.append(value)
+
+    # Calculate and store the corresponding y coordinate
+    graph_y.append(calculate_y(value))
+
+    # Increase x by 1 for the next graph point
+    value += 1
+
+# Plot the quadratic curve and label it
+plt.plot(graph_x, graph_y, label=f"Quadratic: y = {equation}")
+
+# Plot the climbing path with orange points connected by a line
+plt.plot(path_x, path_y, color="orange", marker="o",
+         linestyle="-", markersize=4, label="Climbing path")
+
+# Mark the estimated maximum with a green point
+plt.plot(x, y, "go", markersize=8,
+         label=f"Maximum ({x:.2f}, {y:.2f})")
+
+# Label the horizontal axis
+plt.xlabel("x")
+
+# Label the vertical axis
+plt.ylabel("y")
+
+# Add a title to the graph
+plt.title("Hill Climbing")
+
+# Display grid lines on the graph
+plt.grid()
+
+# Display the graph legend
+plt.legend()
+
+# Show the completed graph
+plt.show()
