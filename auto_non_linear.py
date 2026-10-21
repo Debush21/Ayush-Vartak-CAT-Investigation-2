@@ -1,108 +1,83 @@
+import csv
+import math
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
 
-import matplotlib.pyplot as plt  # Import matplotlib to display the graph.
-import math  # Import math to calculate distances.
-import bisect  # Import bisect to find candidate radii efficiently.
+# ------------------------------------------------------------------
+# Load the data  (x, y, colour)
+# ------------------------------------------------------------------
+points = []
+with open("non_linear_1.csv", newline="") as f:
+    reader = csv.reader(f)
+    for row in reader:
+        if len(row) < 3:
+            continue
+        try:
+            x = float(row[0].strip())
+            y = float(row[1].strip())
+            colour = row[2].strip().lower()
+            if colour not in ("red", "blue"):
+                continue
+            points.append((x, y, colour))
+        except ValueError:
+            continue
 
-# Create empty lists to store the coordinates and actual classifications.
-x_values = []  # Store the x-coordinates of the data points.
-y_values = []  # Store the y-coordinates of the data points.
-labels = []  # Store the actual colours of the data points.
+if not points:
+    raise SystemExit("No valid data found in non_linear_1.csv")
 
-# Open the CSV file and read each data point.
-with open("non_linear_1.csv", "r") as file:  # Open the dataset.
-    for line in file:  # Process each line in the file.
-        x, y, label = line.strip().split(",")  # Separate the coordinates and label.
-        x_values.append(float(x))  # Convert x to a number and store it.
-        y_values.append(float(y))  # Convert y to a number and store it.
-        labels.append(label.strip().lower())  # Store the label in lowercase.
+print(f"Loaded {len(points)} points")
 
-# Calculate each point's distance from the origin (0, 0).
-distances = []  # Create a list to store the distances.
-for x, y in zip(x_values, y_values):  # Process each coordinate pair.
-    distance = math.sqrt(x ** 2 + y ** 2)  # Calculate the distance using Pythagoras.
-    distances.append(distance)  # Add the distance to the list.
+# ------------------------------------------------------------------
+# Scoring function (identical to the manual version)
+# ------------------------------------------------------------------
+def score(radius, points):
+    correct_A = 0
+    correct_B = 0
+    for x, y, colour in points:
+        dist = math.hypot(x, y)
+        inside = dist <= radius
+        if (inside and colour == "red") or (not inside and colour == "blue"):
+            correct_A += 1
+        if (inside and colour == "blue") or (not inside and colour == "red"):
+            correct_B += 1
+    best = max(correct_A, correct_B)
+    return 100.0 * best / len(points)
 
-# Sort the unique distances to identify where classifications can change.
-unique_distances = sorted(set(distances))  # Remove duplicates and sort the distances.
+# ------------------------------------------------------------------
+# Superior search – systematic grid (step 0.1)
+# ------------------------------------------------------------------
+best_radius   = 0.0
+best_accuracy = -1.0
 
-# Create candidate radii representing every possible classification boundary.
-candidate_radii = [0.0]  # Start with a radius of zero.
-for i in range(len(unique_distances) - 1):  # Examine consecutive unique distances.
-    midpoint = (unique_distances[i] + unique_distances[i + 1]) / 2  # Find the midpoint.
-    candidate_radii.append(midpoint)  # Add the midpoint as a candidate radius.
+for r in [i * 0.1 for i in range(0, 1501)]:   # 0.0 → 150.0
+    acc = score(r, points)
+    if acc > best_accuracy:
+        best_accuracy = acc
+        best_radius   = r
 
-# Include a radius larger than every point's distance from the origin.
-candidate_radii.append(unique_distances[-1] + 1)  # Ensure all points can be inside.
+print(f"Best radius found : {best_radius:.1f}")
+print(f"Classification accuracy: {best_accuracy:.1f}%")
 
-# Find the radius that correctly classifies the greatest number of points.
-best_radius = 0.0  # Initialise the best radius.
-best_correct = -1  # Initialise the highest correct classification count.
-best_errors = float("inf")  # Initialise the lowest classification error.
+# ------------------------------------------------------------------
+# Display everything
+# ------------------------------------------------------------------
+xs_red   = [p[0] for p in points if p[2] == "red"]
+ys_red   = [p[1] for p in points if p[2] == "red"]
+xs_blue  = [p[0] for p in points if p[2] == "blue"]
+ys_blue  = [p[1] for p in points if p[2] == "blue"]
 
-# Sort the distances of points labelled red for an efficient search.
-red_distances = sorted(  # Sort distances belonging to actual red points.
-    distances[i] for i in range(len(distances)) if labels[i] == "red"  # Select red points.
-)  # Finish creating the sorted red-distance list.
+fig, ax = plt.subplots(figsize=(8, 8))
+ax.scatter(xs_red,  ys_red,  c="red",  label="Red",  s=50)
+ax.scatter(xs_blue, ys_blue, c="blue", label="Blue", s=50)
 
-# Test each candidate radius systematically.
-for radius in candidate_radii:  # Examine every meaningful candidate radius.
-    red_inside = bisect.bisect_right(red_distances, radius)  # Count red points inside.
-    total_inside = bisect.bisect_right(unique_distances, radius)  # Count all points inside.
-    actual_red = labels.count("red")  # Count the actual red points in the dataset.
-    correct = red_inside + (len(labels) - total_inside - (actual_red - red_inside))  # Count correct predictions.
-    errors = len(labels) - correct  # Calculate the number of incorrect predictions.
+circle = Circle((0, 0), best_radius, fill=False, edgecolor="green",
+                linewidth=2.5, label=f"Best radius = {best_radius:.1f}")
+ax.add_patch(circle)
 
-    # Update the best result if this radius improves accuracy.
-    if correct > best_correct:  # Check whether this radius is more accurate.
-        best_correct = correct  # Save the improved correct count.
-        best_radius = radius  # Save the improved radius.
-        best_errors = errors  # Save the improved error count.
-
-# Calculate the final classification accuracy as a percentage.
-percentage = (best_correct / len(labels)) * 100  # Convert correct predictions to a percentage.
-
-# Create the graph and its axes.
-fig, ax = plt.subplots(figsize=(9, 9))  # Create a square graph.
-
-# Plot every point using its actual colour from the dataset.
-for x, y, label in zip(x_values, y_values, labels):  # Process each data point.
-    ax.scatter(x, y, color=label, s=60)  # Plot the point in its actual colour.
-
-# Draw the automatically calculated classification circle.
-circle = plt.Circle(  # Create a circle centred at the origin.
-    (0, 0),  # Set the centre coordinates to (0, 0).
-    best_radius,  # Use the automatically selected radius.
-    fill=False,  # Leave the inside of the circle transparent.
-    color="black",  # Draw the circle in black.
-    linewidth=2  # Set the circle's line thickness.
-)  # Finish creating the circle.
-ax.add_patch(circle)  # Add the circle to the graph.
-
-# Configure the graph's appearance.
-ax.set_xlim(-100, 100)  # Set the horizontal graph limits.
-ax.set_ylim(-100, 100)  # Set the vertical graph limits.
-ax.set_xlabel("X")  # Label the horizontal axis.
-ax.set_ylabel("Y")  # Label the vertical axis.
-ax.set_title("Automatic Non-Linear Classification")  # Add a descriptive title.
-ax.axhline(0, color="black", linewidth=0.8)  # Draw the horizontal axis.
-ax.axvline(0, color="black", linewidth=0.8)  # Draw the vertical axis.
-ax.grid(True, alpha=0.3)  # Display a lightly shaded grid.
-ax.set_aspect("equal")  # Keep the circle's horizontal and vertical scales equal.
-
-# Display the selected radius and classification accuracy on the graph.
-ax.text(  # Add a text box to the graph.
-    -95,  # Set the text box's horizontal position.
-    92,  # Set the text box's vertical position.
-    f"Radius: {best_radius:.2f}\nScore: {percentage:.2f}%",  # Display the results.
-    fontsize=12,  # Set the text size.
-    bbox=dict(facecolor="white", edgecolor="black")  # Add a bordered white background.
-)  # Finish adding the text box.
-
-# Display the completed graph.
-plt.show()  # Open the graph window.
-
-# Print the final results in the terminal.
-print(f"Best radius: {best_radius:.2f}")  # Display the selected radius.
-print(f"Correct classifications: {best_correct}/{len(labels)}")  # Display correct predictions.
-print(f"Incorrect classifications: {best_errors}")  # Display incorrect predictions.
-print(f"Classification score: {percentage:.2f}%")  # Display the final accuracy.
+ax.set_xlim(-110, 110)
+ax.set_ylim(-110, 110)
+ax.set_aspect("equal")
+ax.grid(True)
+ax.legend()
+ax.set_title(f"Automatic non-linear classification  –  Accuracy {best_accuracy:.1f}%")
+plt.show()
