@@ -1,30 +1,74 @@
-
 # Import libraries for plotting, random numbers and text processing
 import matplotlib.pyplot as plt
 import random
 import re
 
+def clean_equation(raw):
+    """
+    Turn many common quadratic writings into a Python-evaluable expression in x.
+    Accepts forms such as:
+      y = x**2 + 2*x + 5
+      y=x^2+2x+5
+      x^2 + 2x + 5
+      -3x^2 - 4x + 1
+      y = 0.5x**2 - 3x + 2
+    """
+    eq = raw.strip()
+
+    # Remove everything on the left of the last '=' (handles "y = ...")
+    if "=" in eq:
+        eq = eq.split("=")[-1].strip()
+
+    # Drop any remaining "y" that might be left (rare)
+    eq = re.sub(r'\by\b', '', eq)
+
+    # Remove all spaces
+    eq = eq.replace(" ", "")
+
+    # Replace ^ with ** (Python power)
+    eq = eq.replace("^", "**")
+
+    # Insert * between number and x  (e.g. 2x → 2*x, 3.5x → 3.5*x)
+    eq = re.sub(r'(\d)x', r'\1*x', eq)
+    # Also handle .x  (rare but possible after a decimal)
+    eq = re.sub(r'(\.)x', r'\1*x', eq)
+
+    # Insert * between ) and x or number and ( if needed (simple cases)
+    eq = re.sub(r'\)x', r')*x', eq)
+    eq = re.sub(r'x\(', r'x*(', eq)
+
+    # Handle bare "x2" style if someone writes x2 instead of x^2 (optional)
+    # eq = re.sub(r'x2\b', 'x**2', eq)
+
+    # If the expression is empty after cleaning, raise a clear error
+    if not eq:
+        raise ValueError("Could not extract a usable expression from the input.")
+
+    return eq
+
 # Ask the user to enter a quadratic equation
-equation = input("Enter the quadratic equation: ")
+print("Enter a quadratic (examples: y = x**2 + 2*x + 5   or   x^2+2x+5   or   -0.5x^2 - 3x + 1)")
+raw_equation = input("Equation: ")
 
-# Remove spaces from the equation
-equation = equation.replace(" ", "")
-
-# Check whether the equation contains an equals sign
-if "=" in equation:
-    # Keep only the expression on the right side
-    equation = equation.split("=")[1]
-
-# Insert multiplication signs between numbers and x
-equation = re.sub(r'(\d)x', r'\1*x', equation)
-
-# Replace ^ with ** so Python can calculate powers
-equation = equation.replace("^", "**")
+try:
+    equation = clean_equation(raw_equation)
+    print(f"Using expression: {equation}")
+except ValueError as e:
+    print(e)
+    exit()
 
 # Define a function to calculate y for any x value
 def calculate_y(x):
-    # Evaluate the equation using the given x value
+    # Evaluate the equation using the given x value (safe-ish globals)
     return eval(equation, {"__builtins__": {}}, {"x": x})
+
+# Quick sanity check that the expression works
+try:
+    _ = calculate_y(0)
+except Exception as e:
+    print(f"Error evaluating the expression: {e}")
+    print("Please check the equation and try again.")
+    exit()
 
 # Choose a random starting x value between -1000 and 1000
 x = random.uniform(-1000, 1000)
@@ -62,28 +106,16 @@ while step >= minimum_step:
     if left_y > y:
         # Move one step to the left
         x = left_x
-
-        # Update the current y value
         y = left_y
-
-        # Record the new x coordinate
         path_x.append(x)
-
-        # Record the new y coordinate
         path_y.append(y)
 
     # Otherwise, check whether moving right increases the y value
     elif right_y > y:
         # Move one step to the right
         x = right_x
-
-        # Update the current y value
         y = right_y
-
-        # Record the new x coordinate
         path_x.append(x)
-
-        # Record the new y coordinate
         path_y.append(y)
 
     # If neither direction improves the y value
@@ -108,17 +140,12 @@ value = -1000
 
 # Generate graph points until x reaches 1000
 while value <= 1000:
-    # Store the current x coordinate
     graph_x.append(value)
-
-    # Calculate and store the corresponding y coordinate
     graph_y.append(calculate_y(value))
-
-    # Increase x by 1 for the next graph point
     value += 1
 
 # Plot the quadratic curve and label it
-plt.plot(graph_x, graph_y, label=f"Quadratic: y = {equation}")
+plt.plot(graph_x, graph_y, label=f"y = {equation}")
 
 # Plot the climbing path with orange points connected by a line
 plt.plot(path_x, path_y, color="orange", marker="o",
