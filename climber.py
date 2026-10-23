@@ -4,46 +4,28 @@ import random
 import re
 
 def clean_equation(raw):
-    """
-    Turn many common quadratic writings into a Python-evaluable expression in x.
-    Accepts forms such as:
-      y = x**2 + 2*x + 5
-      y=x^2+2x+5
-      x^2 + 2x + 5
-      -3x^2 - 4x + 1
-      y = 0.5x**2 - 3x + 2
-    """
     eq = raw.strip()
-
     # Remove everything on the left of the last '=' (handles "y = ...")
     if "=" in eq:
         eq = eq.split("=")[-1].strip()
-
     # Drop any remaining "y" that might be left (rare)
     eq = re.sub(r'\by\b', '', eq)
-
     # Remove all spaces
     eq = eq.replace(" ", "")
-
     # Replace ^ with ** (Python power)
     eq = eq.replace("^", "**")
-
     # Insert * between number and x  (e.g. 2x → 2*x, 3.5x → 3.5*x)
     eq = re.sub(r'(\d)x', r'\1*x', eq)
     # Also handle .x  (rare but possible after a decimal)
     eq = re.sub(r'(\.)x', r'\1*x', eq)
-
     # Insert * between ) and x or number and ( if needed (simple cases)
     eq = re.sub(r'\)x', r')*x', eq)
     eq = re.sub(r'x\(', r'x*(', eq)
-
     # Handle bare "x2" style if someone writes x2 instead of x^2 (optional)
     # eq = re.sub(r'x2\b', 'x**2', eq)
-
     # If the expression is empty after cleaning, raise a clear error
     if not eq:
         raise ValueError("Could not extract a usable expression from the input.")
-
     return eq
 
 # Ask the user to enter a quadratic equation
@@ -90,16 +72,9 @@ minimum_step = 0.001
 
 # Continue climbing while the step size is large enough
 while step >= minimum_step:
-    # Calculate the x coordinate one step to the left
     left_x = x - step
-
-    # Calculate the x coordinate one step to the right
-    right_x = x + step
-
-    # Calculate the y value to the left
+    right_x = x + step   
     left_y = calculate_y(left_x)
-
-    # Calculate the y value to the right
     right_y = calculate_y(right_x)
 
     # Check whether moving left increases the y value
